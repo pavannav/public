@@ -1,0 +1,10 @@
+
+http://archive.ubuntu.com/ubuntu/pool/main/liba/libaio/libaio1_0.3.110-5ubuntu0.1_amd64.deb
+http://archive.ubuntu.com/ubuntu/pool/main/m/mysql-5.7/mysql-client-core-5.7_5.7.42-0ubuntu0.18.04.1_amd64.deb
+
+http://archive.ubuntu.com/ubuntu/pool/main/m/mysql-defaults/mysql-common_5.8+1.0.4_all.deb
+
+http://archive.ubuntu.com/ubuntu/pool/main/m/mysql-5.7/mysql-client-5.7_5.7.42-0ubuntu0.18.04.1_amd64.deb
+
+http://archive.ubuntu.com/ubuntu/pool/main/m/mysql-5.7/mysql-client_5.7.42-0ubuntu0.18.04.1_all.deb
+
