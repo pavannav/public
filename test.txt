@@ -8,3 +8,5 @@ http://archive.ubuntu.com/ubuntu/pool/main/m/mysql-5.7/mysql-client-5.7_5.7.42-0
 
 http://archive.ubuntu.com/ubuntu/pool/main/m/mysql-5.7/mysql-client_5.7.42-0ubuntu0.18.04.1_all.deb
 
+
+wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl3_3.0.13-0ubuntu3.4_amd64.deb
