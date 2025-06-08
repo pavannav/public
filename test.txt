@@ -10,3 +10,5 @@ http://archive.ubuntu.com/ubuntu/pool/main/m/mysql-5.7/mysql-client_5.7.42-0ubun
 
 
 wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl3_3.0.13-0ubuntu3.4_amd64.deb
+
+ wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl3_3.0.2-0ubuntu1.19_amd64.deb
