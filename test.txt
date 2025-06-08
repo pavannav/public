@@ -64,3 +64,13 @@ psc_config = {
   allowed_consumer_projects = ["project-1-id", "project-2-id"]
 }
 
+====================
+====================
+dynamic "psc_config" {
+  for_each = var.psc_config != null && var.psc_config.psc_enabled ? [1] : []
+  content {
+    # Only pass allowed_consumer_projects if it's not empty
+    allowed_consumer_projects = length(var.psc_config.allowed_consumer_projects) > 0 ? var.psc_config.allowed_consumer_projects : null
+  }
+}
+
