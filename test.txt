@@ -1,14 +1,39 @@
 
-http://archive.ubuntu.com/ubuntu/pool/main/liba/libaio/libaio1_0.3.110-5ubuntu0.1_amd64.deb
-http://archive.ubuntu.com/ubuntu/pool/main/m/mysql-5.7/mysql-client-core-5.7_5.7.42-0ubuntu0.18.04.1_amd64.deb
 
-http://archive.ubuntu.com/ubuntu/pool/main/m/mysql-defaults/mysql-common_5.8+1.0.4_all.deb
+=============
+variable "enable_psc_config" {
+  description = "Enable Private Service Connect configuration in ip_configuration"
+  type        = bool
+  default     = false
+}
 
-http://archive.ubuntu.com/ubuntu/pool/main/m/mysql-5.7/mysql-client-5.7_5.7.42-0ubuntu0.18.04.1_amd64.deb
+variable "psc_allowed_consumer_projects" {
+  description = "List of consumer projects allowed to connect via PSC"
+  type        = list(string)
+  default     = []
+}
 
-http://archive.ubuntu.com/ubuntu/pool/main/m/mysql-5.7/mysql-client_5.7.42-0ubuntu0.18.04.1_all.deb
+----------
 
+    ip_configuration {
+      ssl_mode                                      = ...
+      ipv4_enabled                                  = false
+      private_network                               = var.network
+      enable_private_path_for_google_cloud_services = var.enable_private_path_for_google_cloud_services
 
-wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl3_3.0.13-0ubuntu3.4_amd64.deb
+      dynamic "psc_config" {
+        for_each = var.enable_psc_config ? [1] : []
+        content {
+          allowed_consumer_projects = var.psc_allowed_consumer_projects
+        }
+      }
 
- wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl3_3.0.2-0ubuntu1.19_amd64.deb
+      dynamic "authorized_networks" {
+        for_each = var.authorized_networks != null ? var.authorized_networks : {}
+        iterator = network
+        content {
+          name  = network.key
+          value = network.value
+        }
+      }
+    }
