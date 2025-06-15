@@ -32,27 +32,7 @@ module "sql" {
 }
 
 
-
-
-
-
 =================
 
-gcloud compute url-maps create delivery-url-map \
-  --default-service=projects/amc-q-trans/global/backendServices/amc-q-trans-delivery-elb-delivery-be \
-  --path-matcher-name=matcher1 \
-  --path-rule='/get/*=projects/amc-q-trans/global/backendServices/amc-q-trans-delivery-elb-delivery-be' \
-  --path-rule='/get/*=projects/amc-q-trans/global/backendServices/amc-q-trans-delivery-elb-delivery-be-v2' \
-  --url-rewrite=pathPrefixRewrite=/ \
-  --weighted-backend-service=projects/amc-q-trans/global/backendServices/amc-q-trans-delivery-elb-delivery-be:50 \
-  --weighted-backend-service=projects/amc-q-trans/global/backendServices/amc-q-trans-delivery-elb-delivery-be-v2:50
-
-gcloud compute url-maps add-path-matcher delivery-url-map \
-  --path-matcher-name=matcher1 \
-  --default-service=projects/amc-q-trans/global/backendServices/amc-q-trans-delivery-elb-delivery-be \
-  --path-rules="/get/*=projects/amc-q-trans/global/backendServices/amc-q-trans-delivery-elb-delivery-be" \
-  --path-rules="/get/*=projects/amc-q-trans/global/backendServices/amc-q-trans-delivery-elb-delivery-be-v2" \
-  --url-rewrite=pathPrefixRewrite=/ \
-  --weighted-backend-service=projects/amc-q-trans/global/backendServices/amc-q-trans-delivery-elb-delivery-be:50 \
-  --weighted-backend-service=projects/amc-q-trans/global/backendServices/amc-q-trans-delivery-elb-delivery-be-v2:50
-
+ # Disable PSA if PSC is enabled
+  enable_private_path_for_google_cloud_services = var.psc_enabled ? false : var.enable_private_path_for_google_cloud_services
