@@ -34,5 +34,17 @@ module "sql" {
 
 =================
 
- # Disable PSA if PSC is enabled
-  enable_private_path_for_google_cloud_services = var.psc_enabled ? false : var.enable_private_path_for_google_cloud_services
+dynamic "authorized_networks" {
+  for_each = var.psc_enabled || var.authorized_networks == null ? {} : var.authorized_networks
+  iterator = network
+  content {
+    name  = network.key
+    value = network.value
+  }
+}
+
+
+enable_private_path_for_google_cloud_services = var.psc_enabled ? false : var.enable_private_path_for_google_cloud_services
+
+
+
