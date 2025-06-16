@@ -34,14 +34,109 @@ module "sql" {
 
 =================
 
-dynamic "authorized_networks" {
-  for_each = var.psc_enabled || var.authorized_networks == null ? {} : var.authorized_networks
-  iterator = network
-  content {
-    name  = network.key
-    value = network.value
+Thanks for confirming. If your Cloud SQL instance is still getting both PSA and PSC enabled even after applying changes, here’s what’s likely happening — and how to fix it with certainty:
+
+🔍 Problem Breakdown
+In Google Cloud SQL, enabling PSC doesn't automatically disable PSA (i.e. access via VPC private IP or authorized networks). To enforce PSC-only, you must:
+
+Feature	Disable if PSC is enabled
+authorized_networks	✅ Must not be set
+enable_private_path_for_google_cloud_services	✅ Must be false
+ipv4_enabled	✅ Already disabled (good)
+psc_config.psc_enabled	✅ Should be true
+private_network	✅ Required for PSC but does not enable PSA on its own
+
+If authorized_networks is non-empty or enable_private_path_for_google_cloud_services is true, GCP will allow PSA (Private Service Access) along with PSC — this is by design.
+
+✅ Final, Safe Fix
+Update the entire ip_configuration block exactly as below:
+
+hcl
+Copy
+Edit
+ip_configuration {
+  ssl_mode        = (
+    local.psql_config == "ssl" ? "ENCRYPTED_ONLY" :
+    local.psql_config == "mTLS" ? "TRUSTED_CLIENT_CERTIFICATE_REQUIRED" :
+    "ENCRYPTED_ONLY"
+  )
+
+  ipv4_enabled    = false
+  private_network = var.network
+
+  # Explicitly disable PSA-related features when PSC is enabled
+  enable_private_path_for_google_cloud_services = var.psc_enabled ? false : var.enable_private_path_for_google_cloud_services
+
+  dynamic "authorized_networks" {
+    for_each = var.psc_enabled ? {} : (
+      var.authorized_networks != null ? var.authorized_networks : {}
+    )
+    iterator = network
+    content {
+      name  = network.key
+      value = network.value
+    }
+  }
+
+  dynamic "psc_config" {
+    for_each = var.psc_enabled ? [1] : []
+    content {
+      psc_enabled               = true
+      allowed_consumer_projects = var.psc_allowed_consumer_projects
+    }
   }
 }
+
+🛡️ Add a Validation Rule (Strongly Recommended)
+To prevent user error (e.g., someone enables PSC but still passes PSA configs), add this to the module:
+
+h
+Copy
+Edit
+locals {
+  psa_psc_conflict = var.psc_enabled && (
+    (var.authorized_networks != null && length(var.authorized_networks) > 0)
+    || var.enable_private_path_for_google_cloud_services
+  )
+}
+
+resource "null_resource" "fail_on_dual_access" {
+  count = local.psa_psc_conflict ? 1 : 0
+
+  provisioner "local-exec" {
+    command = "echo '❌ ERROR: PSC is enabled, but PSA (authorized_networks or private_path) is also configured. Choose only one.' && exit 1"
+  }
+}
+🔁 Apply the Changes Again
+Run:
+
+bash
+Copy
+Edit
+terraform apply
+If GCP is still creating a PSA-enabled connection, it's likely due to:
+
+A terraform state issue (try terraform taint google_sql_database_instance.primary)
+
+GCP caching or inherited config (delete & recreate the instance manually to confirm)
+
+A mistaken input — double-check that psc_enabled = true and authorized_networks = null in your *.tfvars
+
+✅ Summary
+To ensure PSC-only Cloud SQL, you must:
+
+Step	Status
+Disable ipv4_enabled	✅ Done
+Disable authorized_networks if psc_enabled = true	✅ FIXED in this answer
+Disable enable_private_path_for_google_cloud_services if psc_enabled = true	✅ FIXED in this answer
+Enable psc_config only when psc_enabled = true	✅ Already correct
+Add validation to block invalid config	✅ Optional but recommended
+
+Let me know if you'd like help creating a reusable module with this logic enforced.
+
+
+
+
 
 
 enable_private_path_for_google_cloud_services = var.psc_enabled ? false : var.enable_private_path_for_google_cloud_services
