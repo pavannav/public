@@ -140,6 +140,7 @@ Let me know if you'd like help creating a reusable module with this logic enforc
 
 
 enable_private_path_for_google_cloud_services = var.psc_enabled ? false : var.enable_private_path_for_google_cloud_services
-
+=======
+Unknown error. Original error message: Operation failed: VPC Access did not have permission to resolve the subnet or the provided subnet does not exist.
 
 
