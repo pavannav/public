@@ -184,3 +184,24 @@ resource "google_compute_forwarding_rule" "sql_psc_endpoint" {
 #  depends_on = [module.psc_ip_reservation]
 }
 ###
+
+-----------
+data "google_compute_service_attachment" "sql_psc_attachment" {
+  name   = var.psc_attachment_name # e.g. "serv-xyz123" (from SQL project)
+  region = var.sql_region
+  project = var.sql_project
+}
+
+resource "google_compute_forwarding_rule" "psc_endpoint" {
+  name                  = "sql-psc-endpoint"
+  region                = var.region
+  project               = var.project_id
+  subnetwork            = var.subnet
+  network               = var.network
+  ip_address            = google_compute_address.psc_sql_ip.id
+  load_balancing_scheme = "INTERNAL"
+  target                = data.google_compute_service_attachment.sql_psc_attachment.self_link
+  ip_protocol           = "TCP"
+  ports                 = ["5432"] # or "3306" for MySQL
+  purpose               = "PRIVATE_SERVICE_CONNECT"
+}
