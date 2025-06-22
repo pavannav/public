@@ -234,3 +234,12 @@ module "addresses" {
    }
  }
 
+Error: Unsupported attribute
+│ 
+│   on sql-psc.tf line 16, in module "db-with-psc":
+│   16:   endpoint_ip = module.addresses.internal-addresses["sql-endpoint-ip"]
+│     ├────────────────
+│     │ module.addresses is a object
+│ 
+│ This object does not have an attribute named "internal-addresses".
+╵
