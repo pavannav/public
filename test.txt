@@ -205,3 +205,10 @@ resource "google_compute_forwarding_rule" "psc_endpoint" {
   ports                 = ["5432"] # or "3306" for MySQL
   purpose               = "PRIVATE_SERVICE_CONNECT"
 }
+
+│   on ../../modules/cloudsql-instance/main.tf line 173, in data "google_compute_service_attachment" "sql_psc_attachment":
+│  173: data "google_compute_service_attachment" "sql_psc_attachment" {
+│ 
+│ The provider hashicorp/google does not support data source "google_compute_service_attachment".
+│ 
+│ Did you intend to use the managed resource type "google_compute_service_attachment"? If so, declare this using a "resource" block instead of a "data" block.
