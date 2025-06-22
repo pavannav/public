@@ -206,9 +206,31 @@ resource "google_compute_forwarding_rule" "psc_endpoint" {
   purpose               = "PRIVATE_SERVICE_CONNECT"
 }
 
-│   on ../../modules/cloudsql-instance/main.tf line 173, in data "google_compute_service_attachment" "sql_psc_attachment":
-│  173: data "google_compute_service_attachment" "sql_psc_attachment" {
-│ 
-│ The provider hashicorp/google does not support data source "google_compute_service_attachment".
-│ 
-│ Did you intend to use the managed resource type "google_compute_service_attachment"? If so, declare this using a "resource" block instead of a "data" block.
+module "db-with-psc" {
+  source           = "../../modules/cloudsql-instance/"
+  project_id       = var.project_id
+
+  network = "https://www.googleapis.com/compute/v1/projects/gpc-d-cgov/global/networks/cgov-test-vpc"
+  name             = "tf-psc-test-db"
+  region           = "us-east4"
+  database_version = "MYSQL_8_0"
+  custom_psql_config = "ssl"
+  deletion_protection = false
+ ## PSC parameters 
+  psc_enabled = true
+#  psc_allowed_consumer_projects =  [""]
+  endpoint_ip = module.addresses.internal-addresses["sql-endpoint-ip"]
+}
+
+module "addresses" {
+   source     = "git::https://github.com/cloud-gcp-gpc/modules.git//net-address"
+   project_id = var.project_id
+   internal_addresses = {
+     sql-endpoint-ip = {
+       region     = "us-east4"
+ #      subnetwork = "https://www.googleapis.com/compute/v1/projects/gpc-net-n-spoke-prj/regions/us-east4/subnetworks/n-subnet001-use4"
+       subnetwork =  "https://www.googleapis.com/compute/v1/projects/gpc-d-cgov/regions/us-east4/subnetworks/sb01-cgov-vpc-use4"
+     }
+   }
+ }
+
