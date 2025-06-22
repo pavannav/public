@@ -161,3 +161,26 @@ resource "google_compute_forwarding_rule" "sql_psc_endpoint" {
 
   depends_on = [module.psc_ip_reservation]
 }
+----
+
+
+# Creates PSC endpoint.
+resource "google_compute_forwarding_rule" "sql_psc_endpoint" {
+  count = var.psc_enabled ? 1 : 0
+
+  name        = "${google_sql_database_instance.primary.name}-psc-endpoint"
+  project     = var.project_id
+  region      = var.region
+  network     = var.network
+#  subnetwork  = var.psc_subnet
+#  endpoint_ip  = var.endpoint-ip
+#  ip_protocol = "TCP"
+#  ports       = ["3306"]
+
+  target = google_sql_database_instance.primary.psc_service_attachment[0].self_link
+#  purpose = "PRIVATE_SERVICE_CONNECT"
+  load_balancing_scheme = ""
+
+#  depends_on = [module.psc_ip_reservation]
+}
+###
