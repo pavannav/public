@@ -252,3 +252,12 @@ Error: Unsupported argument
 │  179:   endpoint_ip           = google_compute_address.addresses.psc_sql_ip.id
 │ 
 │ An argument named "endpoint_ip" is not expected here.
+
+
+
+│ Error: Error creating ForwardingRule: googleapi: Error 400: Invalid value for field 'resource.IPAddress': '192.168.1.5'. The URL is malformed., invalid
+│ 
+│   with module.db-with-psc.google_compute_forwarding_rule.psc_endpoint,
+│   on ../../modules/cloudsql-instance/main.tf line 173, in resource "google_compute_forwarding_rule" "psc_endpoint":
+│  173: resource "google_compute_forwarding_rule" "psc_endpoint" {
+│ 
