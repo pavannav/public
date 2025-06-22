@@ -243,3 +243,12 @@ Error: Unsupported attribute
 │ 
 │ This object does not have an attribute named "internal-addresses".
 ╵
+
+
+
+Error: Unsupported argument
+│ 
+│   on ../../modules/cloudsql-instance/main.tf line 179, in resource "google_compute_forwarding_rule" "psc_endpoint":
+│  179:   endpoint_ip           = google_compute_address.addresses.psc_sql_ip.id
+│ 
+│ An argument named "endpoint_ip" is not expected here.
