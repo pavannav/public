@@ -261,3 +261,13 @@ Error: Unsupported argument
 │   on ../../modules/cloudsql-instance/main.tf line 173, in resource "google_compute_forwarding_rule" "psc_endpoint":
 │  173: resource "google_compute_forwarding_rule" "psc_endpoint" {
 │ 
+
+
+module.db-without-psc.google_compute_forwarding_rule.psc_endpoint: Creating...
+╷
+│ Error: Error creating ForwardingRule: googleapi: Error 400: Invalid value for field 'resource.target': ''. No target or backend service specified for forwarding rule., invalid
+│ 
+│   with module.db-without-psc.google_compute_forwarding_rule.psc_endpoint,
+│   on ../../modules/cloudsql-instance/main.tf line 172, in resource "google_compute_forwarding_rule" "psc_endpoint":
+│  172: resource "google_compute_forwarding_rule" "psc_endpoint" {
+│ 
