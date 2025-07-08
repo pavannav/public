@@ -84,3 +84,112 @@ compute.googleapis.com/Address
 cloudfunctions.googleapis.com/Function
 compute.googleapis.com/RegionDisk
 cloudfunctions.googleapis.com/CloudFunction
+
+=================
+
+GCE Instances
+SELECT
+  name,
+  networkInterface.networkIP AS internal_ip,
+  accessConfig.natIP AS external_ip
+FROM
+  `your_dataset.compute_googleapis_com_Instance`,
+  UNNEST(resource.data.networkInterfaces) AS networkInterface,
+  UNNEST(networkInterface.accessConfigs) AS accessConfig
+
+============
+
+ Reserved static IPs
+sql
+Copy
+Edit
+SELECT
+  name,
+  resource.data.address AS reserved_ip,
+  resource.data.addressType AS type
+FROM
+  `your_dataset.compute_googleapis_com_Address`
+3️⃣ Load Balancer forwarding rules
+sql
+Copy
+Edit
+SELECT
+  name,
+  resource.data.IPAddress AS forwarding_ip
+FROM
+  `your_dataset.compute_googleapis_com_ForwardingRule`
+4️⃣ Filestore
+sql
+Copy
+Edit
+SELECT
+  name,
+  resource.data.networks.ipAddresses AS filestore_ip
+FROM
+  `your_dataset.file_googleapis_com_Instance`,
+  UNNEST(resource.data.networks) AS networks
+5️⃣ GKE clusters
+sql
+Copy
+Edit
+SELECT
+  name,
+  resource.data.endpoint AS master_endpoint_ip
+FROM
+  `your_dataset.container_googleapis_com_Cluster`
+6️⃣ K8s Services (LoadBalancer IPs)
+sql
+Copy
+Edit
+SELECT
+  name,
+  resource.data.status.loadBalancer.ingress.ip AS service_ip
+FROM
+  `your_dataset.k8s_io_Service`,
+  UNNEST(resource.data.status.loadBalancer.ingress) AS ingress
+WHERE
+  ingress.ip IS NOT NULL
+7️⃣ K8s Endpoints
+sql
+Copy
+Edit
+SELECT
+  name,
+  address.ip AS endpoint_ip
+FROM
+  `your_dataset.k8s_io_Endpoints`,
+  UNNEST(resource.data.subsets) AS subset,
+  UNNEST(subset.addresses) AS address
+8️⃣ Service Directory endpoints
+sql
+Copy
+Edit
+SELECT
+  name,
+  resource.data.address AS sd_endpoint_ip
+FROM
+  `your_dataset.servicedirectory_googleapis_com_Endpoint`
+✅ 🏷️ Optional: Subnetwork (CIDR)
+Subnetwork resources do not contain individual IPs in use — they just define the CIDR ranges.
+
+sql
+Copy
+Edit
+SELECT
+  name,
+  resource.data.ipCidrRange AS cidr_range
+FROM
+  `your_dataset.compute_googleapis_com_Subnetwork`
+✅ 🗂️ Putting it all together
+You can UNION ALL these to build a single IP inventory table for your entire project:
+
+sql
+Copy
+Edit
+SELECT 'GCE Instance' AS source, name, networkInterface.networkIP AS ip
+FROM `...compute_googleapis_com_Instance`, UNNEST(...) AS ...
+UNION ALL
+SELECT 'Reserved Address' AS source, name, resource.data.address AS ip
+FROM `...compute_googleapis_com_Address`
+UNION ALL
+...
